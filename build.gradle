@@ -1,51 +1,49 @@
-apply plugin: 'java-library'
-apply from: 'jdks.gradle'
+plugins {
+    id 'java-library'
+}
 
 sourceSets {
-   java9 {
-      java {
-       srcDirs = ['src/main/java9']
-      }
-   }
+    java11 {
+        java {
+            srcDirs 'src/main/java11'
+        }
+    }
 }
 
 dependencies {
     // This is only necessary because in real life, we have dependencies between classes
-    // and what you're likely to want to do, is to provide a JDK 9 specific class, which depends on common
+    // and what you're likely to want to do, is to provide a JDK 11 specific class, which depends on common
     // classes of the main source set. In other words, you want to override some specific classes, but they
     // still have dependencies onto other classes.
-    // We want to avoid recompiling all those classes, so we're just saying that the Java 9 specific classes
+    // We want to avoid recompiling all those classes, so we're just saying that the Java 11 specific classes
     // "depend on" the main ones.
-    java9Implementation files(sourceSets.main.output.classesDirs) { builtBy compileJava }
+    java11Implementation files(sourceSets.main.output.classesDirs) { builtBy compileJava }
 }
 
-compileJava {
-   sourceCompatibility = 8
-   targetCompatibility = 8
+tasks.named('compileJava') {
+    doFirst {
+        println "Build under java 8"
+    }
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
 }
 
-compileJava9Java {
-   sourceCompatibility = 9
-   targetCompatibility = 9
+tasks.named('compileJava11Java') {
+    doFirst {
+        println "Build under java 11"
+    }
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
 }
 
 jar {
-   into('META-INF/versions/9') {
-      from sourceSets.java9.output
-   }
-   manifest.attributes(
-      'Multi-Release': 'true', 
-      'Main-Class': 'com.acme.JdkSpecific'
-   )
+    into('META-INF/versions/11') {
+        from sourceSets.java11.output
+    }
+    manifest.attributes (
+        'Multi-Release': 'true', 
+        'Main-Class': 'com.acme.JdkSpecific'
+    )
 }
-
-// You might wonder why not use the `application` plugin here?
-// Well it's easy: it doesn't build the jar (because it doesn't have to,
-// it can use the class directory instead), so since it's not a jar, multi-release is not seen!
-// Another good reason not to use MRJars!
-task run(type: JavaExec) {
-   dependsOn jar
-   classpath files(jar.archivePath)
-   main = 'com.acme.JdkSpecific'
-}
-
