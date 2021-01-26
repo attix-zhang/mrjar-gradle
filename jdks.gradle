@@ -6,7 +6,7 @@ String compat(String src) {
    }
 }
 
-if (project.hasProperty('crossCompile')) {
+//if (project.hasProperty('crossCompile')) {
    // this will configure the java compile tasks with the appropriate JDK
    project.afterEvaluate {
       tasks.withType(JavaCompile) {
@@ -24,15 +24,15 @@ if (project.hasProperty('crossCompile')) {
           }
       }
    }
-} else {
-   if (!JavaVersion.current().java9Compatible) {
-       throw new GradleException("You must use -PcrossCompile to enable cross compilation, or run Gradle with JDK 9")
-   }
-   project.afterEvaluate {
-      tasks.withType(JavaCompile) {
-         def version = compat(sourceCompatibility)
-         println "Configuring $name to use --release $version"
-         options.compilerArgs.addAll(['--release', version])
-      }
-   }
-}
+//} else {
+//   if (!JavaVersion.current().java9Compatible) {
+//       throw new GradleException("You must use -PcrossCompile to enable cross compilation, or run Gradle with JDK 9")
+//   }
+//   project.afterEvaluate {
+//      tasks.withType(JavaCompile) {
+//         def version = compat(sourceCompatibility)
+//         println "Configuring $name to use --release $version"
+//         options.compilerArgs.addAll(['--release', version])
+//      }
+//   }
+//}
