@@ -5,7 +5,7 @@ plugins {
 sourceSets {
     java11 {
         java {
-            srcDirs 'src/main/java11'
+            srcDirs 'src/java11/java'
         }
     }
 }
@@ -21,18 +21,12 @@ dependencies {
 }
 
 tasks.named('compileJava') {
-    doFirst {
-        println "Build under java 8"
-    }
     javaCompiler = javaToolchains.compilerFor {
         languageVersion = JavaLanguageVersion.of(8)
     }
 }
 
 tasks.named('compileJava11Java') {
-    doFirst {
-        println "Build under java 11"
-    }
     javaCompiler = javaToolchains.compilerFor {
         languageVersion = JavaLanguageVersion.of(11)
     }
@@ -44,6 +38,34 @@ jar {
     }
     manifest.attributes (
         'Multi-Release': 'true', 
-        'Main-Class': 'com.acme.JdkSpecific'
+        'Main-Class': 'com.mrjar.gradle.App'
     )
 }
+
+tasks.register("runOn8", JavaExec, {
+    classpath files(jar.archiveFile)
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+})
+
+tasks.register("runOn11", JavaExec, {
+    classpath files(jar.archiveFile)
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+})
+
+tasks.register("runOn9", JavaExec, {
+    classpath files(jar.archiveFile)
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(9)
+    }
+})
+
+tasks.register("runOn14", JavaExec, {
+    classpath files(jar.archiveFile)
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(14)
+    }
+})
